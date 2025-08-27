@@ -34,6 +34,33 @@ const PIXTransferScreen = () => {
     setAmount(numericValue);
   };
 
+  // Lista de domínios de casas de apostas conhecidas
+  const gamblingDomains = [
+    'bet365.com',
+    'betano.com',
+    'sportingbet.com',
+    'bet777.com',
+    'betfair.com',
+    'rivalo.com',
+    'betway.com',
+    'pixbet.com',
+    'galera.bet',
+    'esportes.da.sorte',
+    'kto.com',
+    'betmotion.com',
+    'novibet.com',
+    'superbet.com',
+    'parimatch.com'
+  ];
+
+  // Função para detectar se é uma chave PIX de casa de apostas
+  const isGamblingPIX = (key: string): boolean => {
+    const lowerKey = key.toLowerCase();
+    
+    // Verifica se contém domínios de apostas
+    return gamblingDomains.some(domain => lowerKey.includes(domain.toLowerCase()));
+  };
+
   const handleTransfer = async () => {
     if (!pixKey || !amount) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios');
@@ -46,9 +73,51 @@ const PIXTransferScreen = () => {
       return;
     }
 
+    // Verificar se é uma transferência para casa de apostas
+    if (isGamblingPIX(pixKey)) {
+      Alert.alert(
+        '🛡️ Proteção Anti-Apostas Ativada',
+        `Detectamos que você está tentando transferir ${formatCurrency(amount)} para uma casa de apostas.\n\nPor sua proteção, vamos redirecionar esse valor para seus investimentos automaticamente.`,
+        [
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+            onPress: () => setLoading(false)
+          },
+          {
+            text: 'Investir Automaticamente',
+            style: 'default',
+            onPress: () => {
+              setLoading(true);
+              // Simular redirecionamento para investimentos
+              setTimeout(() => {
+                Alert.alert(
+                  '✅ Dinheiro Protegido!',
+                  `${formatCurrency(amount)} foi automaticamente investido em sua carteira segura.\n\nVocê acabou de proteger seu dinheiro e ainda por cima ele vai render!`,
+                  [
+                    {
+                      text: 'Ver Investimentos',
+                      onPress: () => {
+                        setPixKey('');
+                        setAmount('');
+                        setDescription('');
+                        setLoading(false);
+                        // Aqui poderia navegar para a tela de investimentos
+                      }
+                    }
+                  ]
+                );
+              }, 2000);
+            }
+          }
+        ]
+      );
+      return;
+    }
+
     setLoading(true);
 
-    // Simular delay da transferência
+    // Simular delay da transferência normal
     setTimeout(() => {
       Alert.alert(
         'Transferência realizada',
@@ -132,6 +201,20 @@ const PIXTransferScreen = () => {
               </View>
             </View>
 
+            {/* Protection Warning */}
+            {isGamblingPIX(pixKey) && (
+              <View style={styles.warningCard}>
+                <View style={styles.warningHeader}>
+                  <Ionicons name="shield-checkmark" size={20} color="#F59E0B" />
+                  <Text style={styles.warningTitle}>Proteção Detectada</Text>
+                </View>
+                <Text style={styles.warningText}>
+                  Esta chave PIX foi identificada como sendo de uma casa de apostas. 
+                  Por sua proteção, o valor será redirecionado para investimentos seguros.
+                </Text>
+              </View>
+            )}
+
             {/* Transfer Button */}
             <TouchableOpacity
               style={[styles.transferButton, loading && styles.transferButtonDisabled]}
@@ -139,9 +222,23 @@ const PIXTransferScreen = () => {
               disabled={loading}
             >
               <Text style={styles.transferButtonText}>
-                {loading ? 'Processando...' : 'Transferir'}
+                {loading ? 'Processando...' : (isGamblingPIX(pixKey) ? 'Investir Automaticamente' : 'Transferir')}
               </Text>
             </TouchableOpacity>
+
+            {/* Protection Info Card */}
+            <View style={styles.protectionCard}>
+              <View style={styles.protectionHeader}>
+                <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+                <Text style={styles.protectionTitle}>Proteção Anti-Apostas Ativa</Text>
+              </View>
+              <Text style={styles.protectionText}>
+                • Monitoramos todas as suas transferências PIX{'\n'}
+                • Sites de apostas são detectados automaticamente{'\n'}
+                • Valores são redirecionados para investimentos seguros{'\n'}
+                • Seu dinheiro fica protegido e ainda rende
+              </Text>
+            </View>
 
             {/* Info Card */}
             <View style={styles.infoCard}>
@@ -255,6 +352,55 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     lineHeight: 20,
+  },
+  // Novos estilos para proteção anti-apostas
+  warningCard: {
+    backgroundColor: '#FEF3C7',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  warningHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  warningTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#92400E',
+    marginLeft: 8,
+  },
+  warningText: {
+    fontSize: 12,
+    color: '#92400E',
+    lineHeight: 18,
+  },
+  protectionCard: {
+    backgroundColor: '#D1FAE5',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  protectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  protectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#065F46',
+    marginLeft: 8,
+  },
+  protectionText: {
+    fontSize: 12,
+    color: '#065F46',
+    lineHeight: 18,
   },
 });
 

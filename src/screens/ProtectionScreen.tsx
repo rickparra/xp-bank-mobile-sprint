@@ -8,15 +8,72 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+
+const { width } = Dimensions.get('window');
 
 const ProtectionScreen = () => {
   const { user, logout } = useAuth();
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [locationEnabled, setLocationEnabled] = useState(false);
+  const [protectionEnabled, setProtectionEnabled] = useState(true);
+  const [autoInvestEnabled, setAutoInvestEnabled] = useState(true);
+  const [showBalance, setShowBalance] = useState(true);
+
+  // Dados simulados de tentativas bloqueadas
+  const blockedAttempts = [
+    {
+      id: '1',
+      site: 'betano.com',
+      amount: 150.00,
+      date: '2024-01-15',
+      time: '14:30',
+      status: 'blocked',
+      redirected: true
+    },
+    {
+      id: '2',
+      site: 'sportingbet.com',
+      amount: 300.00,
+      date: '2024-01-14',
+      time: '20:15',
+      status: 'blocked',
+      redirected: true
+    },
+    {
+      id: '3',
+      site: 'bet365.com',
+      amount: 89.90,
+      date: '2024-01-13',
+      time: '16:45',
+      status: 'blocked',
+      redirected: true
+    }
+  ];
+
+  // Estatísticas de proteção
+  const protectionStats = {
+    totalBlocked: 3,
+    totalProtected: 539.90,
+    monthlySavings: 1200.00,
+    totalInvested: 2500.00
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(amount);
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pt-BR');
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -103,8 +160,8 @@ const ProtectionScreen = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Perfil e Proteção</Text>
-          <Text style={styles.subtitle}>Gerencie sua conta e configurações</Text>
+          <Text style={styles.title}>Proteção Anti-Apostas</Text>
+          <Text style={styles.subtitle}>Seu dinheiro protegido automaticamente</Text>
         </View>
 
         {/* User Info Card */}
@@ -122,6 +179,177 @@ const ProtectionScreen = () => {
           <View style={styles.protectionBadge}>
             <Ionicons name="shield-checkmark" size={20} color="#10B981" />
             <Text style={styles.protectionText}>Protegido</Text>
+          </View>
+        </View>
+
+        {/* Protection Status Card */}
+        <View style={styles.protectionStatusCard}>
+          <View style={styles.protectionStatusHeader}>
+            <View style={styles.protectionStatusLeft}>
+              <View style={[styles.protectionIcon, { backgroundColor: protectionEnabled ? '#10B981' : '#EF4444' }]}>
+                <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
+              </View>
+              <View>
+                <Text style={styles.protectionStatusTitle}>
+                  {protectionEnabled ? 'Proteção Anti-Apostas Ativa' : 'Proteção Desativada'}
+                </Text>
+                <Text style={styles.protectionStatusSubtitle}>
+                  {protectionEnabled ? 'Sistema funcionando perfeitamente' : 'Seu dinheiro pode estar em risco'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={protectionEnabled}
+              onValueChange={setProtectionEnabled}
+              trackColor={{ false: '#E5E5E5', true: '#10B981' }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+        </View>
+
+        {/* Protection Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#FEE2E2' }]}>
+                <Ionicons name="close-circle" size={20} color="#EF4444" />
+              </View>
+              <Text style={styles.statValue}>{protectionStats.totalBlocked}</Text>
+              <Text style={styles.statLabel}>Tentativas Bloqueadas</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#D1FAE5' }]}>
+                <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+              </View>
+              <Text style={[styles.statValue, { color: '#10B981' }]}>
+                {formatCurrency(protectionStats.totalProtected)}
+              </Text>
+              <Text style={styles.statLabel}>Valor Protegido</Text>
+            </View>
+          </View>
+          
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#DBEAFE' }]}>
+                <Ionicons name="save" size={20} color="#3B82F6" />
+              </View>
+              <Text style={[styles.statValue, { color: '#3B82F6' }]}>
+                {formatCurrency(protectionStats.monthlySavings)}
+              </Text>
+              <Text style={styles.statLabel}>Economia Mensal</Text>
+            </View>
+            
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#E0E7FF' }]}>
+                <Ionicons name="trending-up" size={20} color="#8B5CF6" />
+              </View>
+              <Text style={[styles.statValue, { color: '#8B5CF6' }]}>
+                {formatCurrency(protectionStats.totalInvested)}
+              </Text>
+              <Text style={styles.statLabel}>Total Investido</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Protection Settings */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Configurações de Proteção</Text>
+          
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <View style={[styles.settingIcon, { backgroundColor: '#DBEAFE' }]}>
+                <Ionicons name="trending-up" size={20} color="#3B82F6" />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingTitle}>Investimento Automático</Text>
+                <Text style={styles.settingDescription}>Redireciona valores para investimentos</Text>
+              </View>
+            </View>
+            <Switch
+              value={autoInvestEnabled}
+              onValueChange={setAutoInvestEnabled}
+              trackColor={{ false: '#E5E5E5', true: '#3B82F6' }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <View style={[styles.settingIcon, { backgroundColor: '#D1FAE5' }]}>
+                <Ionicons name="shield-checkmark" size={20} color="#10B981" />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={styles.settingTitle}>Notificações de Proteção</Text>
+                <Text style={styles.settingDescription}>Alertas de tentativas bloqueadas</Text>
+              </View>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: '#E5E5E5', true: '#10B981' }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+        </View>
+
+        {/* Blocked Attempts */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Tentativas Bloqueadas</Text>
+          {blockedAttempts.map((attempt) => (
+            <View key={attempt.id} style={styles.blockedAttemptItem}>
+              <View style={styles.blockedAttemptHeader}>
+                <View style={styles.blockedAttemptLeft}>
+                  <View style={styles.blockedAttemptIcon}>
+                    <Ionicons name="close-circle" size={16} color="#EF4444" />
+                  </View>
+                  <View>
+                    <Text style={styles.blockedAttemptSite}>{attempt.site}</Text>
+                    <Text style={styles.blockedAttemptDate}>
+                      {formatDate(attempt.date)} às {attempt.time}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.blockedAttemptRight}>
+                  <Text style={styles.blockedAttemptAmount}>
+                    {formatCurrency(attempt.amount)}
+                  </Text>
+                  <View style={styles.blockedAttemptStatus}>
+                    <Text style={styles.blockedAttemptStatusText}>
+                      {attempt.redirected ? 'Redirecionado' : 'Bloqueado'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              
+              <View style={styles.blockedAttemptFooter}>
+                <View style={styles.blockedAttemptInfo}>
+                  <Ionicons name="warning" size={12} color="#F59E0B" />
+                  <Text style={styles.blockedAttemptInfoText}>Site de apostas detectado</Text>
+                </View>
+                <View style={styles.blockedAttemptInfo}>
+                  <Ionicons name="checkmark-circle" size={12} color="#10B981" />
+                  <Text style={styles.blockedAttemptInfoText}>Valor investido automaticamente</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* How It Works */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Como Funciona a Proteção</Text>
+          <View style={styles.howItWorksContent}>
+            <View style={styles.howItWorksIcon}>
+              <Ionicons name="information-circle" size={20} color="#3B82F6" />
+            </View>
+            <View style={styles.howItWorksText}>
+              <Text style={styles.howItWorksItem}>• Monitoramos todas as suas transferências PIX</Text>
+              <Text style={styles.howItWorksItem}>• Sites de apostas são detectados automaticamente</Text>
+              <Text style={styles.howItWorksItem}>• Valores são bloqueados e redirecionados para investimentos</Text>
+              <Text style={styles.howItWorksItem}>• Você recebe notificações de todas as ações</Text>
+              <Text style={styles.howItWorksItem}>• Seu dinheiro fica seguro e rendendo</Text>
+            </View>
           </View>
         </View>
 
@@ -406,6 +634,179 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 20,
+  },
+  // Novos estilos para proteção anti-apostas
+  protectionStatusCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    padding: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  protectionStatusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  protectionStatusLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  protectionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  protectionStatusTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  protectionStatusSubtitle: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  statsContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  statIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: '#666666',
+    textAlign: 'center',
+  },
+  blockedAttemptItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  blockedAttemptHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  blockedAttemptLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  blockedAttemptIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FEE2E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  blockedAttemptSite: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  blockedAttemptDate: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  blockedAttemptRight: {
+    alignItems: 'flex-end',
+  },
+  blockedAttemptAmount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 4,
+  },
+  blockedAttemptStatus: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  blockedAttemptStatusText: {
+    fontSize: 10,
+    color: '#10B981',
+    fontWeight: '500',
+  },
+  blockedAttemptFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  blockedAttemptInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  blockedAttemptInfoText: {
+    fontSize: 10,
+    color: '#666666',
+    marginLeft: 4,
+  },
+  howItWorksContent: {
+    flexDirection: 'row',
+    padding: 16,
+  },
+  howItWorksIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  howItWorksText: {
+    flex: 1,
+  },
+  howItWorksItem: {
+    fontSize: 12,
+    color: '#666666',
+    lineHeight: 18,
+    marginBottom: 4,
   },
 });
 

@@ -15,6 +15,7 @@ import BillsScreen from '../screens/BillsScreen';
 import CardsScreen from '../screens/CardsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import ProtectionScreen from '../screens/ProtectionScreen';
+import ProjectionsScreen from '../screens/ProjectionsScreen';
 
 import { useAuth } from '../contexts/AuthContext';
 
@@ -117,6 +118,7 @@ const MainContent = () => {
           <Stack.Screen name="TabNavigator" component={TabNavigator} />
           <Stack.Screen name="Transactions" component={TransactionsScreen} />
           <Stack.Screen name="Bills" component={BillsScreen} />
+          <Stack.Screen name="Projections" component={ProjectionsScreen} />
         </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />

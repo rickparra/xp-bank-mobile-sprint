@@ -215,6 +215,42 @@ const DashboardScreen = () => {
           </View>
         </View>
 
+        {/* Financial Projections Section */}
+        <View style={styles.projectionSection}>
+          <View style={styles.projectionCard}>
+            <View style={styles.projectionHeader}>
+              <View style={styles.projectionIcon}>
+                <Ionicons name="analytics" size={20} color="#FFFFFF" />
+              </View>
+              <View style={styles.projectionContent}>
+                <Text style={styles.projectionTitle}>Projeções Financeiras</Text>
+                <Text style={styles.projectionSubtitle}>
+                  Veja quanto você ganharia investindo ao invés de apostar
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.projectionStats}>
+              <View style={styles.projectionStat}>
+                <Text style={styles.projectionStatValue}>R$ 2.540,90</Text>
+                <Text style={styles.projectionStatLabel}>Ganho em 1 ano</Text>
+              </View>
+              <View style={styles.projectionStat}>
+                <Text style={styles.projectionStatValue}>+18,4%</Text>
+                <Text style={styles.projectionStatLabel}>Rentabilidade</Text>
+              </View>
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.projectionButton}
+              onPress={() => navigateTo('Projections')}
+            >
+              <Text style={styles.projectionButtonText}>Ver Projeções Completas</Text>
+              <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -422,6 +458,76 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 20,
+  },
+  // Estilos para seção de projeções financeiras
+  projectionSection: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
+  projectionCard: {
+    backgroundColor: '#3B82F6',
+    borderRadius: 16,
+    padding: 20,
+  },
+  projectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  projectionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  projectionContent: {
+    flex: 1,
+  },
+  projectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  projectionSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 16,
+  },
+  projectionStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  projectionStat: {
+    alignItems: 'center',
+  },
+  projectionStatValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  projectionStatLabel: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  projectionButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  projectionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginRight: 8,
   },
 });
 
