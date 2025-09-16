@@ -6,20 +6,19 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useSimpleNavigation } from '../contexts/SimpleNavigationContext';
 
-const { width } = Dimensions.get('window');
-
 const DashboardScreen = () => {
   const { user, logout } = useAuth();
   const navigation = useNavigation();
   const { navigateTo } = useSimpleNavigation();
   const [showBalance, setShowBalance] = useState(true);
+  const { width } = useWindowDimensions();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -109,6 +108,52 @@ const DashboardScreen = () => {
     navigateTo(route);
   };
 
+  // Calcular largura responsiva dos cartões de ação
+  const getActionCardWidth = () => {
+    const padding = 32; // padding horizontal da seção (16 * 2)
+    const gap = 12; // espaço entre os cartões
+    
+    if (width < 400) {
+      // Telas muito pequenas: 1 coluna
+      return width - padding;
+    } else if (width < 600) {
+      // Telas pequenas: 2 colunas
+      return (width - padding - gap) / 2;
+    } else {
+      // Telas maiores: 2 colunas com largura máxima
+      return Math.min((width - padding - gap) / 2, 200);
+    }
+  };
+
+  // Tamanhos responsivos para ícones e texto
+  const getResponsiveSizes = () => {
+    if (width < 400) {
+      return {
+        iconSize: 20,
+        iconContainerSize: 40,
+        labelSize: 14,
+        descriptionSize: 11,
+        cardPadding: 16,
+      };
+    } else if (width < 600) {
+      return {
+        iconSize: 22,
+        iconContainerSize: 44,
+        labelSize: 15,
+        descriptionSize: 11,
+        cardPadding: 18,
+      };
+    } else {
+      return {
+        iconSize: 24,
+        iconContainerSize: 48,
+        labelSize: 16,
+        descriptionSize: 12,
+        cardPadding: 20,
+      };
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -160,19 +205,40 @@ const DashboardScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ações rápidas</Text>
           <View style={styles.actionsGrid}>
-            {quickActions.map((action, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.actionCard}
-                onPress={() => handleActionPress(action.route)}
-              >
-                <View style={[styles.actionIcon, { backgroundColor: action.color }]}>
-                  <Ionicons name={action.icon as any} size={24} color="#FFFFFF" />
-                </View>
-                <Text style={styles.actionLabel}>{action.label}</Text>
-                <Text style={styles.actionDescription}>{action.description}</Text>
-              </TouchableOpacity>
-            ))}
+            {quickActions.map((action, index) => {
+              const sizes = getResponsiveSizes();
+              return (
+                <TouchableOpacity 
+                  key={index} 
+                  style={[
+                    styles.actionCard,
+                    { 
+                      width: getActionCardWidth(),
+                      padding: sizes.cardPadding,
+                    }
+                  ]}
+                  onPress={() => handleActionPress(action.route)}
+                >
+                  <View style={[
+                    styles.actionIcon, 
+                    { 
+                      backgroundColor: action.color,
+                      width: sizes.iconContainerSize,
+                      height: sizes.iconContainerSize,
+                      borderRadius: sizes.iconContainerSize / 2,
+                    }
+                  ]}>
+                    <Ionicons name={action.icon as any} size={sizes.iconSize} color="#FFFFFF" />
+                  </View>
+                  <Text style={[styles.actionLabel, { fontSize: sizes.labelSize }]}>
+                    {action.label}
+                  </Text>
+                  <Text style={[styles.actionDescription, { fontSize: sizes.descriptionSize }]}>
+                    {action.description}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -374,10 +440,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginTop: 16,
+    gap: 12, // Espaço entre os cartões
   },
   actionCard: {
     backgroundColor: '#FFFFFF',
-    width: (width - 44) / 2,
+    // width será definido dinamicamente via props
+    minWidth: 160, // largura mínima
+    maxWidth: 200, // largura máxima
     padding: 20,
     borderRadius: 12,
     marginBottom: 12,
@@ -390,23 +459,23 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    flex: 0, // Não crescer automaticamente
   },
   actionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    // width, height e borderRadius são definidos dinamicamente
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   actionLabel: {
-    fontSize: 16,
+    // fontSize é definido dinamicamente
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 4,
+    textAlign: 'center',
   },
   actionDescription: {
-    fontSize: 12,
+    // fontSize é definido dinamicamente
     color: '#666666',
     textAlign: 'center',
   },
